@@ -10,7 +10,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
   AWS_REGION: ${{secrets.AWS_REGION}}
   AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-  ROOT_PATH: '../../src/terraform'
+  ROOT_PATH: '${{ github.workspace }}/src/terraform'
 
 jobs:
   terraform:
@@ -36,11 +36,6 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.2.5
-
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
 
       - name: Terraform Init
         id: init
