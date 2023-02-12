@@ -13,8 +13,8 @@ env:
   ROOT_PATH: '${{ github.workspace }}/src/terraform'
 
 jobs:
-  terraform:
-    name: Terraform plan
+  terraform_plan:
+    name: 'Terraform plan'
     runs-on: ubuntu-latest
 
     defaults:
@@ -52,7 +52,34 @@ jobs:
         run: terraform plan 
         working-directory: ${{env.ROOT_PATH}}
 
+  terraform_apply:
+    name: 'Terraform apply'
+    runs-on: ubuntu-latest
+    needs: terraform_plan
+    environment: development
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      #- name: Configure AWS credentials from AWS account
+       # uses: aws-actions/configure-aws-credentials@v1
+        #with:
+         ##aws-region: ${{ secrets.AWS_REGION }}
+          #role-session-name: GitHub-OIDC-TERRAFORM
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.5
+      
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        id: apply
+        run: terraform apply --auto-approve 
         working-directory: ${{env.ROOT_PATH}}
+
