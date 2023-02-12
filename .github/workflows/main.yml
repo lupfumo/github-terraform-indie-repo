@@ -78,6 +78,11 @@ jobs:
         with:
           terraform_version: 1.2.5
       
+      - name: Terraform Init
+        id: init
+        run: terraform init 
+        working-directory: ${{env.ROOT_PATH}}
+      
       - name: Terraform Apply
         id: apply
         run: terraform apply --auto-approve 
