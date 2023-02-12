@@ -1,0 +1,63 @@
+name: "Deploy terraform action"
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+  AWS_REGION: ${{secrets.AWS_REGION}}
+  AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+  ROOT_PATH: '../../src/terraform'
+
+jobs:
+  terraform:
+    name: Terraform plan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      #- name: Configure AWS credentials from AWS account
+       # uses: aws-actions/configure-aws-credentials@v1
+        #with:
+         ##aws-region: ${{ secrets.AWS_REGION }}
+          #role-session-name: GitHub-OIDC-TERRAFORM
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.5
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init 
+        working-directory: ${{env.ROOT_PATH}}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate 
+        working-directory: ${{env.ROOT_PATH}}
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan 
+        working-directory: ${{env.ROOT_PATH}}
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+        working-directory: ${{env.ROOT_PATH}}
