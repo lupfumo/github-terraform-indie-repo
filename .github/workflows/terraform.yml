@@ -85,6 +85,6 @@ jobs:
       
       - name: Terraform Apply
         id: apply
-        run: terraform apply --auto-approve 
+        run: terraform destroy --auto-approve 
         working-directory: ${{env.ROOT_PATH}}
 
