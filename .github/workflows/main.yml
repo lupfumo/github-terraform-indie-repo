@@ -20,7 +20,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        #working-directory: .
+        working-directory: .
 
     steps:
       - name: Git checkout
@@ -45,15 +45,19 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init 
+        working-directory: ${{env.ROOT_PATH}}
 
       - name: Terraform Validate
         id: validate
         run: terraform validate 
+        working-directory: ${{env.ROOT_PATH}}
 
       - name: Terraform Plan
         id: plan
         run: terraform plan 
+        working-directory: ${{env.ROOT_PATH}}
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
+        working-directory: ${{env.ROOT_PATH}}
